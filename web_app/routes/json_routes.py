@@ -13,7 +13,7 @@ DB_PASS = '2QQLDECBgrYioavOEavWO5X2Uv3VGu5A'
 DB_HOST = 'ruby.db.elephantsql.com'
 SQL_URL = 'postgres://cyarxgrz:2QQLDECBgrYioavOEavWO5X2Uv3VGu5A@ruby.db.elephantsql.com:5432/cyarxgrz'
 
-@json_routes.route("/leefly.json")
+@json_routes.route("/leafly.json")
 def return_leefly():
     connection = psycopg2.connect(
         dbname=DB_NAME,
