@@ -12,9 +12,10 @@ flask-migrate = "*"
 python-dotenv = "*"
 py-postgresql = "*"
 psycopg2 = "*"
-import = "*"
 pandas = "*"
-3-8 = "*"
+sklearn = "*"
+scikit-learn = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"
