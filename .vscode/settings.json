@@ -1,3 +1,13 @@
 {
-    "python.pythonPath": "/Users/rubyclaguna/anaconda3/envs/U4-S1-NLP/bin/python"
+    "python.pythonPath": "/Users/rubyclaguna/anaconda3/envs/my-lambdata-env/bin/python",
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./web_app",
+        "-p",
+        "*test*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.unittestEnabled": true
 }

@@ -4,8 +4,8 @@ import os
 class Predictor(): 
     def __init__(self):
         # Load model 
-        self.nn = pickle.load(open(os.getcwd()+"/StrainAPI/models/knn_model.pkl", "rb"))
-        self.tfidf = pickle.load(open(os.getcwd()+"/StrainAPI/models/knn_tfidf.pkl", "rb"))
+        self.nn = pickle.load(open(os.getcwd()+"/web_app/models/knn_model.pkl", "rb"))
+        self.tfidf = pickle.load(open(os.getcwd()+"/web_app/models/knn_tfidf.pkl", "rb"))
 
     def predict(self,user_text,size=5): 
         # Create Vector 
