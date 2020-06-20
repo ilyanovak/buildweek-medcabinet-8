@@ -4,10 +4,13 @@ from flask_migrate import Migrate
 from sqlalchemy import create_engine
 import psycopg2
 from psycopg2.extras import DictCursor
+from web_app.models.nlp_model import Predictor
+from web_app.parser import parser
+from dotenv import load_dotenv
+import pprint
 import pandas
 import os
-from web_app.models.nlp_model import Predictor
-from dotenv import load_dotenv
+
 load_dotenv()
 
 insert_routes = Blueprint("insert_routes", __name__)
@@ -55,13 +58,13 @@ def get_leafly():
     cursor = connection.cursor(cursor_factory=DictCursor)
     engine = create_engine(os.getenv("SQL_URL"))
 
-    query = "SELECT * FROM leafly"
+    query = 'SELECT * FROM leafly'
     cursor.execute(query)
-    result = cursor.fetchall()
+    query_result = cursor.fetchall()
     cursor.close()
     connection.close()
 
-    return jsonify(result)
+    return jsonify(parser(query_result))
 
 @insert_routes.route("/user_data")
 def get_data():
@@ -69,20 +72,34 @@ def get_data():
 
 @insert_routes.route("/print_data", methods=["POST"])
 def display_data():
-    # converts data from from into a dictionary
-    data = dict(request.form)
-    print("RAW USER DATA:", data)
-    print("RAW USER DATA TYPE:", type(data))
+    # Select data from dictionary
+    user_data = request.form['Flavors/Effects']
+    print("RAW USER DATA TYPE:", type(user_data))
+    print("RAW USER DATA:", user_data)
 
-    # extracts the list of flavors and effects from the dictionary
-    user_data = data['Flavors/Effects'].split(sep=',')
-    print("MODIFIED USER DATA:", user_data)
-    print("MODIFIED USER DATA TYPE:", type(user_data))
-
-    # you can pass user_data to ruby's model
+    # Pass user_data into NLP model
     predictor = Predictor()
     results = predictor.predict(user_data, size=5)
     print("NLP RESULTS DATA:", results)
     print("NLP RESULTS DATA TYPE:", type(results))
 
-    return "TODO"
+    # Select rows from table
+    connection = psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASS"),
+        host=os.getenv("DB_HOST")
+        )
+    cursor = connection.cursor(cursor_factory=DictCursor)
+    engine = create_engine(os.getenv("SQL_URL"))
+    query = f'SELECT * FROM leafly WHERE id in {tuple(results)}'
+    cursor.execute(query)
+    query_result = cursor.fetchall()
+    print("--- QUERY RESULT ---")
+    print("QUERY RESULT TYPE:", type(query_result))
+    pprint.pprint(query_result)
+    print("--------------------")
+    cursor.close()
+    connection.close()
+
+    return jsonify(parser(query_result))
