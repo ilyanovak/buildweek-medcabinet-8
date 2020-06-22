@@ -1,30 +1,22 @@
 from flask import Flask, Blueprint, jsonify, render_template, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from sqlalchemy import create_engine
-import psycopg2
-from psycopg2.extras import DictCursor
 from web_app.models.nlp_model import Predictor
 from web_app.parser import parser
-from dotenv import load_dotenv
 import pprint
 import pandas
 import os
-
-load_dotenv()
+from web_app.ConnectDB import ConnectDB
 
 insert_routes = Blueprint("insert_routes", __name__)
 
 @insert_routes.route("/insert_leafly")
 def insert_leafly():
-    connection = psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        host=os.getenv("DB_HOST")
-        )
-    cursor = connection.cursor(cursor_factory=DictCursor)
-    engine = create_engine(os.getenv("SQL_URL"))
+    connect_db = ConnectDB(
+        os.getenv("DB_NAME"),
+        os.getenv("DB_USER"),
+        os.getenv("DB_PASS"),
+        os.getenv("DB_HOST"),
+        os.getenv("SQL_URL")
+    )
 
     query = """CREATE TABLE IF NOT EXISTS
                 leafly(id SERIAL PRIMARY KEY,
@@ -35,34 +27,34 @@ def insert_leafly():
                 flavor VARCHAR(50),
                 description VARCHAR(3000));"""
 
-    cursor.execute(query)
-    connection.commit()
+    connect_db.cursor.execute(query)
+    connect_db.connection.commit()
 
     DB_FILEPATH = os.path.join(os.path.dirname(__file__), "..", "cannabis.csv")
     df = pandas.read_csv(DB_FILEPATH)
-    df.to_sql('leafly', engine, if_exists='replace', index=True, index_label='id')
-    connection.commit()
-    cursor.close()
-    connection.close()
+    df.to_sql('leafly', connect_db.engine, if_exists='replace',
+              index=True, index_label='id')
+    connect_db.connection.commit()
+    connect_db.cursor.close()
+    connect_db.connection.close()
 
     return ('Successfly Inserted CSV to Database')
 
 @insert_routes.route("/get_leafly")
 def get_leafly():
-    connection = psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        host=os.getenv("DB_HOST")
-        )
-    cursor = connection.cursor(cursor_factory=DictCursor)
-    engine = create_engine(os.getenv("SQL_URL"))
+    connect_db = ConnectDB(
+        os.getenv("DB_NAME"),
+        os.getenv("DB_USER"),
+        os.getenv("DB_PASS"),
+        os.getenv("DB_HOST"),
+        os.getenv("SQL_URL")
+    )
 
     query = 'SELECT * FROM leafly'
-    cursor.execute(query)
-    query_result = cursor.fetchall()
-    cursor.close()
-    connection.close()
+    connect_db.cursor.execute(query)
+    query_result = connect_db.cursor.fetchall()
+    connect_db.cursor.close()
+    connect_db.connection.close()
 
     return jsonify(parser(query_result))
 
@@ -84,22 +76,22 @@ def display_data():
     print("NLP RESULTS DATA TYPE:", type(results))
 
     # Select rows from table
-    connection = psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        host=os.getenv("DB_HOST")
-        )
-    cursor = connection.cursor(cursor_factory=DictCursor)
-    engine = create_engine(os.getenv("SQL_URL"))
+    connect_db = ConnectDB(
+        os.getenv("DB_NAME"),
+        os.getenv("DB_USER"),
+        os.getenv("DB_PASS"),
+        os.getenv("DB_HOST"),
+        os.getenv("SQL_URL")
+    )
+
     query = f'SELECT * FROM leafly WHERE id in {tuple(results)}'
-    cursor.execute(query)
-    query_result = cursor.fetchall()
+    connect_db.cursor.execute(query)
+    query_result = connect_db.cursor.fetchall()
     print("--- QUERY RESULT ---")
     print("QUERY RESULT TYPE:", type(query_result))
     pprint.pprint(query_result)
     print("--------------------")
-    cursor.close()
-    connection.close()
+    connect_db.cursor.close()
+    connect_db.connection.close()
 
     return jsonify(parser(query_result))
