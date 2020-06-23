@@ -1,11 +1,15 @@
-<html>
+{% extends "bootstrap_layout.html" %}
 
-        <form action="/print_data" method="POST">
-            <label>Effects and Flavors:</label>
-            <input type="text" name="Flavors/Effects" placeholder="Creative, Energetic, Tingly, Earthy, Sweet, Citrus" value="Creative, Energetic, Tingly, Earthy, Sweet, Citrus">
+{% set active_page = "effects_flavors" %}
 
-            <button>Submit</button>
+{% block content %}
 
-            </form>
+    <form action="/print_data" method="POST">
+        <label>Effects and Flavors:</label>
+        <input type="text" name="Flavors/Effects" style="width: 600px;"
+            placeholder="Creative, Energetic, Tingly, Earthy, Sweet, Citrus"
+            value="Creative, Energetic, Tingly, Earthy, Sweet, Citrus">
+        <button>Submit</button>
+    </form>
 
-</html>
+{% endblock %}

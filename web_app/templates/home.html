@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-        {% block nav %}
-        <h1><a href="/">Main Page</a></h1>
-        <ul>
-            <li><a href="/insert_leafly">Insert Leafly CSV</a></li>
-            <li><a href="/get_leafly">Get Leafly</a></li>
-            <li><a href="/user_data">Test User Prediction</a></li>
-        </ul>
-        {% endblock %}
-</body>
-</html>
+{% extends "bootstrap_layout.html" %}
+
+{% block content %}
+
+    <ul>
+        <li><a href="/insert_leafly">Insert Leafly CSV File</a></li>
+        <li><a href="/get_leafly">Get Leafly CSV File</a></li>
+    </ul>
+
+{% endblock %}

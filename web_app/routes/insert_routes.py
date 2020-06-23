@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, jsonify, render_template, request
+from flask import Flask, Blueprint, jsonify, render_template, request, flash, redirect
 from web_app.models.nlp_model import Predictor
 from web_app.parser import parser
 import pprint
@@ -38,7 +38,8 @@ def insert_leafly():
     connect_db.cursor.close()
     connect_db.connection.close()
 
-    return ('Successfly Inserted CSV to Database')
+    flash('Successfly Inserted Leafly CSV into Database', 'success')
+    return redirect('/')
 
 @insert_routes.route("/get_leafly")
 def get_leafly():
